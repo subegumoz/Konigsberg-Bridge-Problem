@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+section {
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #66B2FF;
+}
+
+/* Butona tıklanınca kalıcı olarak mavi olması için */
+.clicked {
+    background-color: #66B2FF !important;
+    color: white !important;
+}
+nav ul li a.active {
+    color: #66B2FF;
+    font-weight: bold;
+}
+.problem-content {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    line-height: 1.6;
+    overflow-y: auto;
+    height: 80vh;
+}
+nav ul li a.active {
+    color: #4a90e2; /* Daha açık mavi tonu */
+    font-weight: bold;
+}
+.problem-content {
+    max-width: 800px;  /* Sayfanın genişliği anasayfadaki gibi olsun */
+    margin: 20px auto;  /* Ortalamak için */
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}

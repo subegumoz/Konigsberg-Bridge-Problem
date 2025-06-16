@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Make Graph - Königsberg Bridge</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <header>
+        <h1>Königsberg Bridge Problem</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problem.html">Problem</a></li>
+                <li><a href="graph-theory.html">Graph Theory</a></li>
+                <li><a href="make-graph.html" class="active">Make Graph</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+        
+        <div class="interactive-container">
+            <div class="graph-area">
+                <div id="graphVisualization"></div>
+            </div>
+            
+            <div class="algorithm-status">
+                <h3>Graph Analysis</h3>
+                <div class="status-box">
+                    <div class="status-item">
+                        <span class="status-label">Euler Path:</span>
+                        <span id="eulerPathStatus" class="status-value">No</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Euler Circuit:</span>
+                        <span id="eulerCircuitStatus" class="status-value">No</span>
+                    </div>
+                </div>
+                <div class="graph-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Vertices:</span>
+                        <span id="vertexCount" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Edges:</span>
+                        <span id="edgeCount" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+         </div>
+
+
+        <div class="cta-buttons">
+            <button id="clearGraph" class="primary-button">Clear Graph</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Königsberg Bridge Problem by Su Begüm Öz</p>
+        </div>
+    </footer>
+
+    <script>
+        const nodes = new vis.DataSet([]);
+        const edges = new vis.DataSet([]);
+        let selectedNode = null;
+        let nodeCounter = 1;
+
+        const container = document.getElementById('graphVisualization');
+        const data = { nodes: nodes, edges: edges };
+
+        const options = {
+            nodes: {
+                shape: 'circle',
+                size: 4,
+                font: {
+                    size: 3,
+                    color: '#000000',
+                    face: 'Arial',
+                    align: 'center'
+                },
+                borderWidth: 1,
+                borderWidthSelected: 2,
+                color: {
+                    background: '#FFFFFF',
+                    border: '#000000',
+                    highlight: {
+                        background: '#FFFFFF',
+                        border: '#000000'
+                    },
+                    hover: {
+                        background: '#FFFFFF',
+                        border: '#000000'
+                    }
+                }
+            },
+            edges: {
+                width: 1,
+                color: {
+                    color: '#000000',
+                    highlight: '#000000',
+                    hover: '#000000'
+                },
+                smooth: {
+                    type: 'dynamic'
+                },
+                arrows: {
+                    to: { enabled: false }
+                }
+            },
+            physics: { enabled: false },
+            interaction: {
+                dragNodes: false,
+                dragView: false,
+                zoomView: false,
+                hover: true,
+                tooltipDelay: 0,
+                selectable: true,
+                selectConnectedEdges: false,
+                touch: {
+                    enabled: true,
+                    delayTouchStart: 0,
+                    zoomSpeed: 1
+                }
+            },
+            manipulation: { enabled: false }
+        };
+
+        const network = new vis.Network(container, data, options);
+
+        function resizeNetwork() {
+            if (container && network) {
+                const width = container.offsetWidth;
+                const height = container.offsetHeight;
+                network.setSize(width + 'px', height + 'px');
+            }
+        }
+
+        setTimeout(resizeNetwork, 0);
+        window.addEventListener('resize', resizeNetwork);
+
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const tapThreshold = 200;
+        const moveThreshold = 10;
+
+        network.on('click', function(params) {
+            if (params.nodes.length === 0 && params.edges.length === 0) {
+                const position = params.pointer.canvas;
+                const newNode = {
+                    id: nodeCounter++,
+                    label: '0',
+                    x: position.x,
+                    y: position.y
+                };
+                nodes.add(newNode);
+                updateGraphAnalysis();
+            } else if (params.nodes.length > 0) {
+                const nodeId = params.nodes[0];
+                if (selectedNode === null) {
+                    selectedNode = nodeId;
+                    network.selectNodes([nodeId]);
+                } else if (selectedNode !== nodeId) {
+                    const existingEdge = edges.get().find(edge => 
+                        (edge.from === selectedNode && edge.to === nodeId) ||
+                        (edge.from === nodeId && edge.to === selectedNode)
+                    );
+                    if (!existingEdge) {
+                        edges.add({ from: selectedNode, to: nodeId });
+                        updateNodeDegree(selectedNode);
+                        updateNodeDegree(nodeId);
+                    }
+                    network.unselectAll();
+                    selectedNode = null;
+                    updateGraphAnalysis();
+                } else {
+                    network.unselectAll();
+                    selectedNode = null;
+                }
+            }
+        });
+
+        network.on('onTouchEvent', function(params) {
+            switch (params.event.type) {
+                case 'touchstart':
+                    touchStartTime = Date.now();
+                    const touch = params.event.changedTouches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    break;
+                case 'touchend':
+                    const touchDuration = Date.now() - touchStartTime;
+                    const touchEnd = params.event.changedTouches[0];
+                    const moveDistance = Math.hypot(touchEnd.clientX - touchStartX, touchEnd.clientY - touchStartY);
+
+                    if (touchDuration < tapThreshold && moveDistance < moveThreshold) {
+                        const pointer = network.getPointerFromEvent(params.event);
+                        const canvasCoords = pointer.canvas;
+                        const clickedNodeId = network.getNodeAt(pointer.canvas);
+
+                        if (clickedNodeId === undefined) {
+                            const newNode = {
+                                id: nodeCounter++,
+                                label: '0',
+                                x: canvasCoords.x,
+                                y: canvasCoords.y
+                            };
+                            nodes.add(newNode);
+                            updateGraphAnalysis();
+                        } else {
+                            if (selectedNode === null) {
+                                selectedNode = clickedNodeId;
+                                network.selectNodes([clickedNodeId]);
+                            } else if (selectedNode !== clickedNodeId) {
+                                const existingEdge = edges.get().find(edge => 
+                                    (edge.from === selectedNode && edge.to === clickedNodeId) ||
+                                    (edge.from === clickedNodeId && edge.to === selectedNode)
+                                );
+                                if (!existingEdge) {
+                                    edges.add({ from: selectedNode, to: clickedNodeId });
+                                    updateNodeDegree(selectedNode);
+                                    updateNodeDegree(clickedNodeId);
+                                }
+                                network.unselectAll();
+                                selectedNode = null;
+                                updateGraphAnalysis();
+                            } else {
+                                network.unselectAll();
+                                selectedNode = null;
+                            }
+                        }
+                    }
+                    touchStartTime = 0;
+                    touchStartX = 0;
+                    touchStartY = 0;
+                    break;
+            }
+        });
+
+        function updateNodeDegree(nodeId) {
+            const degree = edges.get().filter(edge => edge.from === nodeId || edge.to === nodeId).length;
+            nodes.update({ id: nodeId, label: degree.toString() });
+        }
+
+        function updateGraphAnalysis() {
+            const nodeList = nodes.get();
+            const edgeList = edges.get();
+            let oddDegreeCount = 0;
+            nodeList.forEach(node => {
+                const degree = parseInt(node.label);
+                if (degree % 2 !== 0) oddDegreeCount++;
+            });
+
+            document.getElementById('eulerCircuitStatus').textContent = (oddDegreeCount === 0 && edgeList.length > 0) ? 'Yes' : 'No';
+            document.getElementById('eulerPathStatus').textContent = ((oddDegreeCount === 0 || oddDegreeCount === 2) && edgeList.length > 0) ? 'Yes' : 'No';
+            document.getElementById('vertexCount').textContent = nodeList.length;
+            document.getElementById('edgeCount').textContent = edgeList.length;
+        }
+
+        document.getElementById('clearGraph').addEventListener('click', function() {
+            nodes.clear();
+            edges.clear();
+            selectedNode = null;
+            nodeCounter = 1;
+            network.unselectAll();
+            updateGraphAnalysis();
+        });
+
+        updateGraphAnalysis();
+
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('#graphVisualization')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>

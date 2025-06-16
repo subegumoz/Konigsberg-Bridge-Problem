@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problem - Königsberg Bridge</title>
+    <title>The Problem - Königsberg Bridge</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,22 +13,34 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="problem.html" class="active">Problem</a></li>
-                <li><a href="solution.html">Solution</a></li>
                 <li><a href="graph-theory.html">Graph Theory</a></li>
                 <li><a href="make-graph.html">Make Graph</a></li>
-                <li><a href="test-graph.html">Test Graph</a></li>
-                <li><a href="modify-bridges.html">Modify Bridges</a></li>
             </ul>
         </nav>
     </header>
 
-    <section class="problem-content">
-        <h2>Problem</h2>
-        <p>Here will be a detailed explanation of the Königsberg Bridge Problem.</p>
+    <section class="graph-theory-content">
+        <div class="problem-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Konigsberg_bridges.png" alt="Königsberg's seven bridges">
+            <p class="image-caption">Img: Seven bridges of Königsberg</p>
+        </div>
+
+        <p>In the 18th century, the city of Königsberg (now Kaliningrad) had four land areas connected by seven bridges. People wondered: is it possible to walk through the city, crossing each bridge exactly once?</p>
+
+        <p>In 1736, mathematician Leonhard Euler approached the problem in a new way. He represented land areas as points (vertices) and bridges as lines (edges). This abstraction led him to an important point: such a path is only possible if there are zero or two points with an odd number of bridges.</p>
+
+        <p>But in Königsberg, all four had an odd number, making the riddle impossible to solve. Euler's work led to the foundation for graph theory, a branch of mathematics that explores how things connect, from cities and networks to social relationships.</p>
+
+        <p>I can hear you wondering: But what is graph theory?</p>
+
+
+        <div class="cta-buttons">
+            <a href="graph-theory.html" class="primary-button">Explore Further</a>
+        </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 Königsberg Bridge Problem</p>
+        <p>&copy; 2025 Königsberg Bridge Problem by Su Begüm Öz</p>
     </footer>
 </body>
 </html>
